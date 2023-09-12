@@ -1,4 +1,4 @@
-package fr.edyp.socketwriter.server;
+package fr.edyp.mzdb.server;
 
 public class MethodKeys {
 

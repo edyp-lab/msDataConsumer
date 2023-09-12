@@ -34,6 +34,10 @@ public class MzDBMetaData implements SerializationInterface {
     //Init list as empty
   }
 
+  public MzDBMetaData(SerializationReader reader) throws IOException {
+    read(reader);
+  }
+
   public MzDbHeader getMzdbHeader() {
     return mzdbHeader;
   }
@@ -140,8 +144,29 @@ public class MzDBMetaData implements SerializationInterface {
 
   @Override
   public void write(SerializationWriter writer) throws IOException {
-    //JPM.TODO
+
+    mzdbHeader.write(writer);
+
+    writeList(writer,  dataEncodings;
+    writeList(writer, instrumentConfigurations);
+    writeList(writer, sharedParamTrees);
+    writeList(writer, processingMethods);
+    writeList(writer, runs);
+    writeList(writer, samples);
+    writeList(writer, softwares);
+    writeList(writer, sourceFiles);
+    writeList(writer, cvList);
+    writeList(writer, cvTerms);
+    writeList(writer, cvUnits);
   }
+
+  private void writeList(SerializationWriter writer, List list) throws IOException {
+    writer.writeInt32(list.size());
+    for (Object serializableObject : list) {
+      ((SerializationInterface) serializableObject).write(writer);
+    }
+  }
+
 
   @Override
   public void read(SerializationReader reader) throws IOException {
@@ -229,6 +254,7 @@ public class MzDBMetaData implements SerializationInterface {
 
     lowestMS1Mz = reader.readDouble();
 
-
   }
+
+
 }

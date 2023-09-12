@@ -1,4 +1,4 @@
-package fr.edyp.socketwriter.server;
+package fr.edyp.mzdb.server;
 
 import fr.profi.mzdb.serialization.SerializationReader;
 import org.slf4j.Logger;
