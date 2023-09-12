@@ -147,7 +147,7 @@ public class MzDBMetaData implements SerializationInterface {
 
     mzdbHeader.write(writer);
 
-    writeList(writer,  dataEncodings;
+    writeList(writer,  dataEncodings);
     writeList(writer, instrumentConfigurations);
     writeList(writer, sharedParamTrees);
     writeList(writer, processingMethods);
