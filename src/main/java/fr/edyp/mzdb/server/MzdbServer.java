@@ -1,10 +1,13 @@
 package fr.edyp.mzdb.server;
 
+import fr.profi.mzdb.client.MethodKeys;
 import fr.profi.mzdb.serialization.SerializationReader;
+import fr.profi.mzdb.serialization.SerializationWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -22,16 +25,28 @@ public class MzdbServer {
 
             MzdbController mzdbController = new MzdbController();
 
+
+
+            System.out.println("Listen to "+port);
+
+            Socket sockClient = serverSocket.accept();
+
+            System.out.println("Client Connected");
+
+            InputStream inputStream = sockClient.getInputStream();
+            SerializationReader reader = new SerializationReader(inputStream);
+
+            OutputStream outputStream = sockClient.getOutputStream();
+            SerializationWriter writer = new SerializationWriter(outputStream, 1024);
+
+            //int cmd = 1;
+
             while (true) {
 
-                Socket sockClient = serverSocket.accept();
-
-                InputStream inputStream = sockClient.getInputStream();
-                SerializationReader reader = new SerializationReader(inputStream);
-
-                PrintWriter outputStream = new PrintWriter(sockClient.getOutputStream());
-
                 int methodKey = reader.readInt32();
+
+                //System.out.println("Cmd : "+cmd);
+                //cmd++;
 
                 String response;
                 switch (methodKey) {
@@ -52,6 +67,7 @@ public class MzdbServer {
                         break;
                     }
                     case MethodKeys.METHOD_KEY_EXIT: {
+                        outputStream.close();
                         System.exit(0);
                     }
                     default: {
@@ -61,9 +77,9 @@ public class MzdbServer {
                 }
 
 
-                outputStream.print(response);
-                outputStream.flush();
-                outputStream.close();
+                writer.writeString(response);
+                writer.flush();
+
 
 
             }

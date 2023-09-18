@@ -30,6 +30,7 @@ public class MzdbWriterApi {
             BBSizes defaultBBsize = new BBSizes(5, 10000, 15, 0);
 
             m_writer = new MzDBWriter(destinationFile, mzDbMetaData, defaultBBsize, isDIA);
+            m_writer.initialize();
         } catch (Exception e) {
             LOGGER.error("error in initializeMzdb", e);
             return "KO:"+e.getMessage();
@@ -37,17 +38,12 @@ public class MzdbWriterApi {
         return "OK";
     }
 
-    public String addspectrum(Spectrum spectrum, DataEncoding dataEncoding)  throws IOException, SQLiteException {
+    public String addspectrum(Spectrum spectrum, SpectrumMetaData spectrumMetaData, DataEncoding dataEncoding)  throws IOException, SQLiteException {
 
         try {
 
             SpectrumHeader spectrumHeader = spectrum.getHeader();
 
-            SpectrumMetaData spectrumMetaData = new SpectrumMetaData(
-                    spectrumHeader.getSpectrumId(),
-                    spectrumHeader.getParamTreeAsString(null),
-                    spectrumHeader.getScanListAsString(null),
-                    spectrumHeader.getPrecursorListAsString(null));
 
             m_writer.insertSpectrum(spectrum, spectrumMetaData, dataEncoding);
         } catch (Exception e) {

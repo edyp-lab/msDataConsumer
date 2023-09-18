@@ -49,9 +49,10 @@ public class MzdbController {
 
         try {
             Spectrum spectrum = new Spectrum(reader);
+            SpectrumMetaData spectrumMetaData = new SpectrumMetaData(reader);
             DataEncoding dataEncoding = new DataEncoding(reader);
 
-            m_mzdbWriterApi.addspectrum(spectrum, dataEncoding);
+            m_mzdbWriterApi.addspectrum(spectrum, spectrumMetaData, dataEncoding);
 
         } catch (Exception e) {
             LOGGER.error("error in addspectrum", e);
