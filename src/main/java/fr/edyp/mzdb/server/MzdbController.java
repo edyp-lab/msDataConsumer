@@ -1,14 +1,11 @@
 package fr.edyp.mzdb.server;
 
 import com.almworks.sqlite4java.SQLiteException;
-import fr.edyp.mzdb.writer.MzdbWriterApi;
-import fr.profi.mzdb.BBSizes;
-import fr.profi.mzdb.io.writer.MzDBWriter;
+import fr.profi.mzdb.client.MzdbWriterApi;
 import fr.profi.mzdb.model.AcquisitionMode;
 import fr.profi.mzdb.model.MzDBMetaData;
 import fr.profi.mzdb.serialization.SerializationReader;
 
-import java.io.File;
 import java.io.IOException;
 import fr.profi.mzdb.model.*;
 import org.slf4j.Logger;

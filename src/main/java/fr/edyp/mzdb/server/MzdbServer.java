@@ -39,14 +39,14 @@ public class MzdbServer {
             OutputStream outputStream = sockClient.getOutputStream();
             SerializationWriter writer = new SerializationWriter(outputStream, 1024);
 
-            //int cmd = 1;
+            int cmd = 1;
 
             while (true) {
 
                 int methodKey = reader.readInt32();
 
-                //System.out.println("Cmd : "+cmd);
-                //cmd++;
+                System.out.println("Cmd : "+cmd+"   "+methodKey);
+                cmd++;
 
                 String response;
                 switch (methodKey) {
