@@ -57,6 +57,10 @@ public class MzdbServer {
                         response = mzdbController.addspectrum(reader);
                         break;
                     }
+                    case MethodKeys.METHOD_KEY_ADD_MZDB_METADATA: {
+                        response = mzdbController.addMzdbMetaData(reader);
+                        break;
+                    }
                     case MethodKeys.METHOD_KEY_CLOSE_MZDB: {
                         response = mzdbController.closedb();
                         break;

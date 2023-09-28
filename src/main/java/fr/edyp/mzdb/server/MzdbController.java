@@ -29,15 +29,30 @@ public class MzdbController {
         try {
             String path = reader.readString(); // 1
 
-            MzDBMetaData mzDbMetaData = new MzDBMetaData();
-            mzDbMetaData.read(reader);  // 2
+            //MzDBMetaData mzDbMetaData = new MzDBMetaData();
+            //mzDbMetaData.read(reader);  // 2
 
-            AcquisitionMode srcAcqMode = AcquisitionMode.getEnum(reader); // 3
+            AcquisitionMode srcAcqMode = AcquisitionMode.getEnum(reader); // 2
 
-            return m_mzdbWriterApi.initializeMzdb(path, mzDbMetaData, srcAcqMode);
+            return m_mzdbWriterApi.initializeMzdb(path, srcAcqMode);
 
         } catch (Exception e) {
             LOGGER.error("error in initializeMzdb", e);
+            return "KO:"+e.getMessage();
+        }
+    }
+
+    public String addMzdbMetaData(SerializationReader reader) {
+
+
+        try {
+            MzDBMetaData mzDbMetaData = new MzDBMetaData();
+            mzDbMetaData.read(reader);
+
+            return m_mzdbWriterApi.addMzdbMetaData(mzDbMetaData);
+
+        } catch (Exception e) {
+            LOGGER.error("error in addMzdbMetaData", e);
             return "KO:"+e.getMessage();
         }
     }
@@ -46,10 +61,10 @@ public class MzdbController {
 
         try {
             Spectrum spectrum = new Spectrum(reader);
-            SpectrumMetaData spectrumMetaData = new SpectrumMetaData(reader);
+            //SpectrumMetaData spectrumMetaData = new SpectrumMetaData(reader);
             DataEncoding dataEncoding = new DataEncoding(reader);
 
-            m_mzdbWriterApi.addspectrum(spectrum, spectrumMetaData, dataEncoding);
+            m_mzdbWriterApi.addspectrum(spectrum, dataEncoding);
 
         } catch (Exception e) {
             LOGGER.error("error in addspectrum", e);
