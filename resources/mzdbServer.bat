@@ -1,0 +1,1 @@
+java -Xms512m -Xmx768m -Djava.library.path="./lib" -jar MzdbSocketWriter-@version@.jar
