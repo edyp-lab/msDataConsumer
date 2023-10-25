@@ -44,7 +44,8 @@ public class MzdbServer {
 
                 int methodKey = reader.readInt32();
 
-                System.out.println("Cmd : "+cmd+"   "+methodKey);
+                if(cmd%1000==0)
+                    System.out.println("Cmd key: "+methodKey+" count:  "+cmd);
                 cmd++;
 
                 String response;
