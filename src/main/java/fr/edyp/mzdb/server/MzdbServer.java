@@ -17,6 +17,9 @@ public class MzdbServer {
     private static final Logger LOGGER = LoggerFactory.getLogger(MzdbServer.class);
 
 
+    private static Socket m_sockClient = null;
+    private static boolean m_interrupt = false;
+
     public static void processRequests(int port) {
 
         try {
@@ -26,16 +29,23 @@ public class MzdbServer {
 
 
 
-            System.out.println("Listen to "+port);
+            if (m_interrupt) {
+                return;
+            }
 
-            Socket sockClient = serverSocket.accept();
+            String message = "Listen to "+port;
+            LOGGER.info(message);
 
-            System.out.println("Client Connected");
+            m_sockClient = serverSocket.accept();
 
-            InputStream inputStream = sockClient.getInputStream();
+            message = "Client Connected";
+            LOGGER.info(message);
+
+
+            InputStream inputStream = m_sockClient.getInputStream();
             SerializationReader reader = new SerializationReader(inputStream);
 
-            OutputStream outputStream = sockClient.getOutputStream();
+            OutputStream outputStream = m_sockClient.getOutputStream();
             SerializationWriter writer = new SerializationWriter(outputStream, 1024);
 
             int cmd = 1;
@@ -44,7 +54,7 @@ public class MzdbServer {
 
                 int methodKey = reader.readInt32();
 
-                System.out.println("Cmd : "+cmd+"   "+methodKey);
+                //System.out.println("Cmd : "+cmd+"   "+methodKey);
                 cmd++;
 
                 String response;
@@ -75,6 +85,7 @@ public class MzdbServer {
                     }
                     default: {
                         response = "KO:Unknow Request";
+                        LOGGER.error(response);
                     }
 
                 }
@@ -88,6 +99,20 @@ public class MzdbServer {
             }
         } catch (Exception e) {
             LOGGER.error("Server Error", e);
+
+        }
+    }
+
+    public static void interrupt() {
+        if (m_sockClient == null) {
+            return;
+        }
+
+        try {
+            m_interrupt = true;
+            m_sockClient.close();
+        } catch (Exception e) {
+
         }
     }
 }
