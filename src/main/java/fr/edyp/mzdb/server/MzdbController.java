@@ -2,11 +2,16 @@ package fr.edyp.mzdb.server;
 
 import com.almworks.sqlite4java.SQLiteException;
 import fr.profi.mzdb.client.MzdbWriterApi;
+import fr.profi.mzdb.db.model.Software;
+import fr.profi.mzdb.db.model.params.ParamTree;
 import fr.profi.mzdb.model.AcquisitionMode;
 import fr.profi.mzdb.model.MzDBMetaData;
 import fr.profi.mzdb.serialization.SerializationReader;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Properties;
+
 import fr.profi.mzdb.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +54,22 @@ public class MzdbController {
             MzDBMetaData mzDbMetaData = new MzDBMetaData();
             mzDbMetaData.read(reader);
 
+            String version = "1.2.1-SNAPSHOT"; // JPM keep in sync for the moment
+
+            try {
+                // JPM : this code does not work for the moment : must be FIXED.
+                Properties properties = new Properties();
+                properties.load(MzdbController.class.getResourceAsStream("mzdbServerWriter.properties"));
+                version = properties.getProperty("mzdbServer.version", "");
+            } catch (Exception e) {
+                LOGGER.warn("error in addMzdbMetaData : can not get current version");
+            }
+
+            List<Software> softwares = mzDbMetaData.getSoftwares();
+            int id = softwares.size()+1;
+            Software software = new Software(id, "MzdbServerWriter", version, new ParamTree());
+            mzDbMetaData.getSoftwares().add(software);
+
             return m_mzdbWriterApi.addMzdbMetaData(mzDbMetaData);
 
         } catch (Exception e) {
@@ -61,18 +82,23 @@ public class MzdbController {
 
         try {
             Spectrum spectrum = new Spectrum(reader);
-            //SpectrumMetaData spectrumMetaData = new SpectrumMetaData(reader);
+            id = spectrum.getHeader().getSpectrumId();
             DataEncoding dataEncoding = new DataEncoding(reader);
 
             m_mzdbWriterApi.addspectrum(spectrum, dataEncoding);
 
+            reader.resetStream(); // must be done at the end : avoid the stream to exceed max size when adding multiple spectrum
+
         } catch (Exception e) {
-            LOGGER.error("error in addspectrum", e);
+            LOGGER.error("error in addspectrum "+id, e);
             return "KO:"+e.getMessage();
         }
 
+
+
         return "OK";
     }
+    private static long id = -1;
 
 
     public String closedb() {
