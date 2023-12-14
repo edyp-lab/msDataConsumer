@@ -22,10 +22,10 @@
             <outputDirectory>/lib</outputDirectory>
         </fileSet>
 
-        <fileSet>
+        <!-- <fileSet>
             <directory>${project.build.directory}/classes/fr/edyp/mzdb/server</directory>
             <outputDirectory>/conf</outputDirectory>
-        </fileSet>
+        </fileSet> -->
 
         <fileSet>
             <directory>${project.build.directory}</directory>
