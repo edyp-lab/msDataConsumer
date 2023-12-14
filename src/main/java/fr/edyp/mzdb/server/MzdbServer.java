@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Properties;
 
 
 public class MzdbServer {
@@ -27,6 +28,17 @@ public class MzdbServer {
 
             MzdbController mzdbController = new MzdbController();
 
+            String version = "";
+
+            try {
+                Properties properties = new Properties();
+                properties.load(MzdbController.class.getResourceAsStream("mzdbServerWriter.properties"));
+                version = properties.getProperty("mzdbServer.version", "");
+                System.out.println("Mzdb Server Writer Version : "+version);
+
+            } catch (Exception e) {
+                LOGGER.warn("error in addMzdbMetaData : can not get current version");
+            }
 
 
             if (m_interrupt) {

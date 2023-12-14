@@ -18,13 +18,13 @@
         </fileSet>
 
         <fileSet>
-            <directory>${project.build.directory}/conf</directory>
-            <outputDirectory>/conf</outputDirectory>
+            <directory>${project.build.directory}/lib</directory>
+            <outputDirectory>/lib</outputDirectory>
         </fileSet>
 
         <fileSet>
-            <directory>${project.build.directory}/lib</directory>
-            <outputDirectory>/lib</outputDirectory>
+            <directory>${project.build.directory}/classes/fr/edyp/mzdb/server</directory>
+            <outputDirectory>/conf</outputDirectory>
         </fileSet>
 
         <fileSet>

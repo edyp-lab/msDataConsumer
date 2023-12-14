@@ -54,13 +54,14 @@ public class MzdbController {
             MzDBMetaData mzDbMetaData = new MzDBMetaData();
             mzDbMetaData.read(reader);
 
-            String version = "1.2.1-SNAPSHOT"; // JPM keep in sync for the moment
+            String version = "";
 
             try {
-                // JPM : this code does not work for the moment : must be FIXED.
                 Properties properties = new Properties();
                 properties.load(MzdbController.class.getResourceAsStream("mzdbServerWriter.properties"));
                 version = properties.getProperty("mzdbServer.version", "");
+                System.out.println("Mzdb Server Writer Version : "+version);
+
             } catch (Exception e) {
                 LOGGER.warn("error in addMzdbMetaData : can not get current version");
             }
