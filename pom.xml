@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>edyp.mzdb.server</groupId>
+  <groupId>fr.profi.mzdb.server</groupId>
   <artifactId>MzdbServerWriter</artifactId>
   <packaging>jar</packaging>
   <name>MzdbServerWriter</name>
@@ -159,7 +159,7 @@
             <manifest>
               <addClasspath>true</addClasspath>
               <classpathPrefix>lib/</classpathPrefix>
-              <mainClass>fr.edyp.mzdb.server.Main</mainClass>
+              <mainClass>fr.profi.mzdb.server.MzdbServerMain</mainClass>
               <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
               <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
             </manifest>

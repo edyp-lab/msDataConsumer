@@ -1,4 +1,4 @@
-package fr.edyp.mzdb.server;
+package fr.profi.mzdb.server;
 
 import fr.profi.mzdb.client.MethodKeys;
 import fr.profi.mzdb.serialization.SerializationReader;

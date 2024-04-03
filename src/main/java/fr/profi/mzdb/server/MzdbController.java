@@ -1,4 +1,4 @@
-package fr.edyp.mzdb.server;
+package fr.profi.mzdb.server;
 
 import com.almworks.sqlite4java.SQLiteException;
 import fr.profi.mzdb.client.MzdbWriterApi;

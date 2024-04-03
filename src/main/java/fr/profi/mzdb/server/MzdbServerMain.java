@@ -1,7 +1,7 @@
-package fr.edyp.mzdb.server;
+package fr.profi.mzdb.server;
 
 
-public class Main {
+public class MzdbServerMain {
 
 
     public static void main(String args[]) {
