@@ -105,10 +105,10 @@
             </goals>
             <configuration>
               <encoding>UTF-8</encoding>
-              <outputDirectory>${project.build.directory}/classes/fr/edyp/mzdb/server</outputDirectory>
+              <outputDirectory>${project.build.directory}/classes/fr/profi/mzdb/server</outputDirectory>
               <resources>
                 <resource>
-                  <directory>src/main/resources/fr/edyp/mzdb/server</directory>
+                  <directory>src/main/resources/fr/profi/mzdb/server</directory>
                   <filtering>true</filtering>
                 </resource>
               </resources>
