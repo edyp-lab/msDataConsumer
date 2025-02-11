@@ -1,11 +1,13 @@
 package fr.profi.mzdb.server;
 
 import fr.profi.mzdb.client.MethodKeys;
+import fr.profi.mzdb.serialization.SerializationCallback;
 import fr.profi.mzdb.serialization.SerializationReader;
 import fr.profi.mzdb.serialization.SerializationWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
@@ -13,118 +15,168 @@ import java.net.Socket;
 import java.util.Properties;
 
 
-public class MzdbServer {
+public class MzdbServer implements IMzdbServer{
 
+    private static MzdbServer m_instance;
     private static final Logger LOGGER = LoggerFactory.getLogger(MzdbServer.class);
 
-
+    private ServerSocket m_serverSocket;
     private static Socket m_sockClient = null;
     private static boolean m_interrupt = false;
+    private  ThermoReadController rawController;
 
-    public static void processRequests(int port) {
+    private MzdbServer(){
 
+    }
+
+    public static MzdbServer getInstance(){
+        if(m_instance==null)
+            m_instance = new MzdbServer();
+        return m_instance;
+    }
+
+    public  synchronized void doInterrupt(){
+        m_interrupt = true;
+    }
+
+    private synchronized boolean isInterrupted(){
+        return m_interrupt;
+    }
+
+    public void addCallBack(SerializationCallback c){
+        rawController.setCallBack(c);
+    }
+
+    public void initialize(int port){
         try {
-            ServerSocket serverSocket = new ServerSocket(port);
-
-            MzdbController mzdbController = new MzdbController();
-
-            String version = "";
+            m_serverSocket = new ServerSocket(port);
+            rawController = new ThermoReadController();
 
             try {
                 Properties properties = new Properties();
                 properties.load(MzdbController.class.getResourceAsStream("mzdbServerWriter.properties"));
-                version = properties.getProperty("mzdbServer.version", "");
-                System.out.println("Mzdb Server Writer Version : "+version);
+                String version = properties.getProperty("mzdbServer.version", "");
+                LOGGER.info("Mzdb Server Writer Version : "+version);
 
             } catch (Exception e) {
                 LOGGER.warn("error in addMzdbMetaData : can not get current version");
             }
 
-
-            if (m_interrupt) {
-                return;
-            }
-
-            String message = "Listen to "+port;
-            LOGGER.info(message);
-
-            m_sockClient = serverSocket.accept();
-
-            message = "Client Connected";
-            LOGGER.info(message);
-
-
-            InputStream inputStream = m_sockClient.getInputStream();
-            SerializationReader reader = new SerializationReader(inputStream);
-
-            OutputStream outputStream = m_sockClient.getOutputStream();
-            SerializationWriter writer = new SerializationWriter(outputStream, 1024);
-
-            //int cmd = 1;
-
-            while (true) {
-
-                int methodKey = reader.readInt32();
-
-                //System.out.println("Cmd : "+cmd+"   "+methodKey);
-                //cmd++;
-
-                String response;
-                switch (methodKey) {
-                    case MethodKeys.METHOD_KEY_INITIALIZE_MZDB: {
-                        response = mzdbController.initializeMzdb(reader);
-                        break;
-                    }
-                    case MethodKeys.METHOD_KEY_ADD_SPECTRUM: {
-                        response = mzdbController.addspectrum(reader);
-                        break;
-                    }
-                    case MethodKeys.METHOD_KEY_ADD_MZDB_METADATA: {
-                        response = mzdbController.addMzdbMetaData(reader);
-                        break;
-                    }
-                    case MethodKeys.METHOD_KEY_CLOSE_MZDB: {
-                        response = mzdbController.closedb();
-                        break;
-                    }
-                    case MethodKeys.METHOD_KEY_TEST: {
-                        response = mzdbController.test(reader);
-                        break;
-                    }
-                    case MethodKeys.METHOD_KEY_EXIT: {
-                        outputStream.close();
-                        System.exit(0);
-                    }
-                    default: {
-                        response = "KO:Unknow Request";
-                        LOGGER.error(response);
-                    }
-
-                }
-
-
-                writer.writeString(response);
-                writer.flush();
-
-
-
-            }
-        } catch (Exception e) {
-            LOGGER.error("Server Error", e);
-
+        } catch (IOException e) {
+            throw new RuntimeException("Error opening server Socket ",e);
         }
     }
 
-    public static void interrupt() {
-        if (m_sockClient == null) {
-            return;
-        }
-
+    public void processRequests() {
         try {
-            m_interrupt = true;
-            m_sockClient.close();
-        } catch (Exception e) {
 
+            if(m_serverSocket == null){
+                throw new RuntimeException("Mzdb Server has not been initialized. Call initialize first.");
+            }
+
+            while (true) { //Until server is interrupted
+
+                if (isInterrupted()) {
+                    return; //Sever closed
+                }
+
+                String message = "Listen to " + m_serverSocket.getLocalPort();
+                LOGGER.info(message);
+
+                //get "next" Socket client
+                m_sockClient = m_serverSocket.accept();
+
+                message = "Client Connected";
+                LOGGER.info(message);
+
+                InputStream inputStream = m_sockClient.getInputStream();
+                SerializationReader reader = new SerializationReader(inputStream);
+
+                OutputStream outputStream = m_sockClient.getOutputStream();
+                SerializationWriter writer = new SerializationWriter(outputStream, 1024);
+
+                MzdbController mzdbController = new MzdbController();
+
+                //int cmd = 1;
+                LOGGER.info(" Enter Client Wait data loop...  ");
+                boolean exitClient = false;
+                while (!exitClient) {
+
+                    int methodKey = reader.readInt32();
+//
+//                    if (isInterrupted()) {
+//                        exitServer();
+//                    }
+                    //System.out.println("Cmd : "+cmd+"   "+methodKey);
+                    //cmd++;
+
+                    String response = null;
+                    switch (methodKey) {
+                        case MethodKeys.METHOD_KEY_INITIALIZE_MZDB: {
+                            response = mzdbController.initializeMzdb(reader);
+                            break;
+                        }
+                        case MethodKeys.METHOD_KEY_ADD_SPECTRUM: {
+                            response = mzdbController.addspectrum(reader);
+                            break;
+                        }
+                        case MethodKeys.METHOD_KEY_ADD_MZDB_METADATA: {
+                            response = mzdbController.addMzdbMetaData(reader);
+                            break;
+                        }
+                        case MethodKeys.METHOD_KEY_CLOSE_MZDB: {
+                            response = mzdbController.closedb();
+                            break;
+                        }
+                        case MethodKeys.METHOD_KEY_TEST: {
+                            response = mzdbController.test(reader);
+                            break;
+                        }
+                        case MethodKeys.METHOD_KEY_ADD_ACQ_METADATA: {
+                            response = rawController.readRawMetaData(reader);
+                            break;
+                        }
+                        case MethodKeys.METHOD_KEY_FINISHED: {
+                            LOGGER.info(" Exit Client  ");
+                            outputStream.close();
+                            inputStream.close();
+                            m_sockClient.close();
+                            exitClient = true;
+                            break;
+                        }
+                        default: {
+                            response = "KO:Unknow Request "+methodKey;
+                            LOGGER.error(response);
+                        }
+                    }
+
+                    if(response!=null) {
+                        writer.writeString(response);
+                        writer.flush();
+                    }
+
+                } //While processing client
+
+            } // keep server up
+        } catch (Exception e) {
+            LOGGER.error("Processing - Server Error ", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    public void interrupt() {
+        LOGGER.debug(" --- Stop MzdbServer ");
+        doInterrupt(); //notify process before exiting
+        try {
+            if (m_sockClient != null) {
+                m_sockClient.close();
+            }
+            if(m_serverSocket!=null) {
+                m_serverSocket.close();
+            }
+        } catch (Exception e) {
+            LOGGER.error(" Error stoping server "+e.getMessage());
         }
     }
 }
