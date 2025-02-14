@@ -1,7 +1,7 @@
-package fr.profi.mzdb.server;
+package fr.profi.msdata.consumer;
 
+import fr.profi.msdata.serialization.SerializationCallback;
 import fr.profi.mzdb.client.MethodKeys;
-import fr.profi.mzdb.serialization.SerializationCallback;
 import fr.profi.mzdb.serialization.SerializationReader;
 import fr.profi.mzdb.serialization.SerializationWriter;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
@@ -19,27 +19,27 @@ import java.util.Properties;
 
 
 /**
- * IMzdbServer implementation using a Multithreading, allowing multiple clients to connect at the same time
+ * IMsDataConsumer implementation using a Multithreading, allowing multiple clients to connect at the same time
  * !!! WARNING !!! This implementation should not be used to write mzdb files => Thread issue in mzdbWriter
  */
-public class MzdbThreadedServer implements IMzdbServer{
+public class MsDataThreadedConsumer implements IMsDataConsumer {
 
-    private static MzdbThreadedServer m_instance;
-    private static final Logger LOGGER = LoggerFactory.getLogger(MzdbThreadedServer.class);
+    private static MsDataThreadedConsumer m_instance;
+    private static final Logger LOGGER = LoggerFactory.getLogger(MsDataThreadedConsumer.class);
 
     private static boolean m_interrupt = false;
     private ServerSocket m_serverSocket;
     private SerializationCallback callback;
 
     private final List<SocketClientRunnable> runningThread;
-    private MzdbThreadedServer(){
+    private MsDataThreadedConsumer(){
         LOGGER.warn("  !!! WARNING !!! This implementation should not be used to write mzdb files => Thread issue in mzdbWriter. ");
         runningThread = new ArrayList<>();
     }
 
-    public static MzdbThreadedServer getInstance(){
+    public static MsDataThreadedConsumer getInstance(){
         if(m_instance==null)
-            m_instance = new MzdbThreadedServer();
+            m_instance = new MsDataThreadedConsumer();
         return m_instance;
     }
 
@@ -55,12 +55,12 @@ public class MzdbThreadedServer implements IMzdbServer{
 
             try {
                 Properties properties = new Properties();
-                properties.load(MzdbController.class.getResourceAsStream("mzdbServerWriter.properties"));
-                String version = properties.getProperty("mzdbServer.version", "");
-                System.out.println("Mzdb Server Writer Version : "+version);
+                properties.load(MsDataThreadedConsumer.class.getResourceAsStream("msDataConsumer.properties"));
+                String version = properties.getProperty("msdataConsumer.version", "");
+                System.out.println("msData Consumer Version : "+version);
 
             } catch (Exception e) {
-                LOGGER.warn("error in addMzdbMetaData : can not get current version");
+                LOGGER.warn("error in initialize : can not get current version");
             }
 
         } catch (IOException e) {
@@ -72,7 +72,7 @@ public class MzdbThreadedServer implements IMzdbServer{
         try {
 
             if(m_serverSocket == null){
-                throw new RuntimeException("Mzdb Server has not been initialized. Call initialize first.");
+                throw new RuntimeException("msData Consumer has not been initialized. Call initialize first.");
             }
 
 
@@ -91,7 +91,7 @@ public class MzdbThreadedServer implements IMzdbServer{
                 message = "Client "+(nbClient++) +" Connected. Running "+(getRunnableSize()+1);
                 LOGGER.info(message);
 
-                ThermoReadController readController = new ThermoReadController();
+                MetaDataReadController readController = new MetaDataReadController();
                 readController.setCallBack(callback);
                 SocketClientRunnable runnable  = new SocketClientRunnable(sockClient, readController);
                 addRunnable(runnable);
@@ -136,7 +136,7 @@ public class MzdbThreadedServer implements IMzdbServer{
     }
 
     public void interrupt() {
-        LOGGER.info("Stop MzdbThreadedServer  ");
+        LOGGER.info("Stop msData Consumer Threads  ");
         doInterrupt();
         closeServer();
     }
@@ -161,8 +161,8 @@ public class MzdbThreadedServer implements IMzdbServer{
 
         private boolean isRunning = true;
 
-        private final ThermoReadController m_rawController;
-        public SocketClientRunnable(Socket sockClient,ThermoReadController rawController){
+        private final MetaDataReadController m_rawController;
+        public SocketClientRunnable(Socket sockClient, MetaDataReadController rawController){
             m_sockClient = sockClient;
             m_rawController = rawController;
         }

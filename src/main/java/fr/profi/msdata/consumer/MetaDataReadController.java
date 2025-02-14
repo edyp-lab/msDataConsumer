@@ -1,6 +1,6 @@
-package fr.profi.mzdb.server;
+package fr.profi.msdata.consumer;
 
-import fr.profi.mzdb.serialization.SerializationCallback;
+import fr.profi.msdata.serialization.SerializationCallback;
 import fr.profi.mzdb.serialization.SerializationReader;
 import fr.profi.thermoreader.model.RunMetaData;
 import org.slf4j.Logger;
@@ -14,9 +14,9 @@ import java.util.List;
  * send it to specified callback.
  *
  */
-public class ThermoReadController {
+public class MetaDataReadController {
 
-  private static final Logger logger = LoggerFactory.getLogger(ThermoReadController.class);
+  private static final Logger logger = LoggerFactory.getLogger(MetaDataReadController.class);
 
   private SerializationCallback m_callback;
 

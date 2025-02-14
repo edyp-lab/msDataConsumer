@@ -1,4 +1,4 @@
-package fr.profi.mzdb.serialization;
+package fr.profi.msdata.serialization;
 
 import fr.profi.thermoreader.model.RunMetaData;
 

@@ -1,15 +1,15 @@
-package fr.profi.mzdb.server;
+package fr.profi.msdata.consumer;
 
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import fr.profi.mzdb.serialization.SerializationCallback;
+import fr.profi.msdata.serialization.SerializationCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Scanner;
 
-public class MzdbServerMain {
+public class MsDataConsumerMain {
 
  public static class ServerParameters {
    @Parameter(names = {"-p", "--port"}, description = "Port to listen on. Client should use same port. ")
@@ -23,26 +23,26 @@ public class MzdbServerMain {
 
  }
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(MzdbServerMain.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(MsDataConsumerMain.class);
 
-  private static MzdbServerMain m_instance;
-  private IMzdbServer server;
+  private static MsDataConsumerMain m_instance;
+  private IMsDataConsumer server;
 
   private boolean isInitialized = false;
-  private MzdbServerMain(){
+  private MsDataConsumerMain(){
 
   }
 
- public static MzdbServerMain getInstance(){
+ public static MsDataConsumerMain getInstance(){
    if(m_instance == null)
-     m_instance = new MzdbServerMain();
+     m_instance = new MsDataConsumerMain();
 
    return m_instance;
  }
 
 
   public void initServer(String[] args){
-    LOGGER.info("... Initialize Mzdb Server  ");
+    LOGGER.info("... Initialize msData Consumer  ");
     ServerParameters parameters = new ServerParameters();
     JCommander cmd = JCommander.newBuilder().addObject(parameters).build();
     cmd.parse(args);
@@ -52,9 +52,9 @@ public class MzdbServerMain {
     }
 
     if(parameters.threaded)
-      server =  MzdbThreadedServer.getInstance();
+      server =  MsDataThreadedConsumer.getInstance();
     else
-      server =  MzdbServer.getInstance();
+      server =  MsDataConsumer.getInstance();
     server.initialize(parameters.port);
 
     isInitialized = true;
@@ -63,27 +63,27 @@ public class MzdbServerMain {
   public void start(){
     Thread.setDefaultUncaughtExceptionHandler((t1, e) -> {
       System.out.println("An exception Caught in Thread "+ t1.getName()+" exception = " + e);
-      MzdbServerMain.getInstance().interrupt(true);
+      MsDataConsumerMain.getInstance().interrupt(true);
     });
 
-    LOGGER.info("... Start Mzdb Server...  ");
+    LOGGER.info("... Start msData Consumer...  ");
     if(!isInitialized)
-      throw new RuntimeException("MzdbServerMain is not initialized ! Call initServer first");
-    Thread t = new Thread(() -> server.processRequests(), "MzdbServerImplem-Thread");
+      throw new RuntimeException("MsDataConsumerMain is not initialized ! Call initServer first");
+    Thread t = new Thread(() -> server.processRequests(), "MsDatConsumer-Thread");
     t.setDaemon(true);
     t.start();
 
   }
 
   /**
-   * Initialize the Mzdb Server Main and start it to listen for client
+   * Initialize the msData Consumer Main and start it to listen for client
    * @param args parameter to used for server initialization
    */
     public static void main(String[] args) {
 
-      System.out.println("MzdbServer Main ... initializing ");
-      MzdbServerMain.getInstance().initServer(args);
-      MzdbServerMain.getInstance().start();
+      System.out.println("msData Consumer ... initializing ");
+      MsDataConsumerMain.getInstance().initServer(args);
+      MsDataConsumerMain.getInstance().start();
 
       LOGGER.info("\n -------------------------------------------------------------- \n");
       LOGGER.info("\n ------------------ Enter \"exit\" to stop server ------------- \n");
@@ -94,7 +94,7 @@ public class MzdbServerMain {
         String userInput = scanner.nextLine();
 
         if (userInput.equals("exit")) {
-          MzdbServerMain.getInstance().interrupt(true);
+          MsDataConsumerMain.getInstance().interrupt(true);
         }
       }
     }
@@ -104,7 +104,7 @@ public class MzdbServerMain {
     }
 
     public void interrupt(boolean doSysExit) {
-        LOGGER.info("... Stop Mzdb Server...  ");
+        LOGGER.info("... Stop msData Consumer...  ");
         server.interrupt();
         if(doSysExit)
           System.exit(0);

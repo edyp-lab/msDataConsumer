@@ -22,11 +22,6 @@
             <outputDirectory>/lib</outputDirectory>
         </fileSet>
 
-        <!-- <fileSet>
-            <directory>${project.build.directory}/classes/fr/edyp/mzdb/server</directory>
-            <outputDirectory>/conf</outputDirectory>
-        </fileSet> -->
-
         <fileSet>
             <directory>${project.build.directory}</directory>
             <includes>

@@ -1,6 +1,5 @@
-package fr.profi.mzdb.server;
+package fr.profi.msdata.consumer;
 
-import com.almworks.sqlite4java.SQLiteException;
 import fr.profi.mzdb.client.MzdbWriterApi;
 import fr.profi.mzdb.db.model.Software;
 import fr.profi.mzdb.db.model.params.ParamTree;
@@ -62,9 +61,9 @@ public class MzdbController {
 
             try {
                 Properties properties = new Properties();
-                properties.load(MzdbController.class.getResourceAsStream("mzdbServerWriter.properties"));
-                version = properties.getProperty("mzdbServer.version", "");
-                System.out.println("Mzdb Server Writer Version : "+version);
+                properties.load(MzdbController.class.getResourceAsStream("msDataConsumer.properties"));
+                version = properties.getProperty("msdataConsumer.version", "");
+                System.out.println("msData Consumer Version : "+version);
 
             } catch (Exception e) {
                 LOGGER.warn("error in addMzdbMetaData : can not get current version");

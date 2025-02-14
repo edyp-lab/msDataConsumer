@@ -1,7 +1,7 @@
-package fr.profi.mzdb.server;
+package fr.profi.msdata.consumer;
 
 import fr.profi.mzdb.client.MethodKeys;
-import fr.profi.mzdb.serialization.SerializationCallback;
+import fr.profi.msdata.serialization.SerializationCallback;
 import fr.profi.mzdb.serialization.SerializationReader;
 import fr.profi.mzdb.serialization.SerializationWriter;
 import org.slf4j.Logger;
@@ -15,23 +15,23 @@ import java.net.Socket;
 import java.util.Properties;
 
 
-public class MzdbServer implements IMzdbServer{
+public class MsDataConsumer implements IMsDataConsumer {
 
-    private static MzdbServer m_instance;
-    private static final Logger LOGGER = LoggerFactory.getLogger(MzdbServer.class);
+    private static MsDataConsumer m_instance;
+    private static final Logger LOGGER = LoggerFactory.getLogger(MsDataConsumer.class);
 
     private ServerSocket m_serverSocket;
     private static Socket m_sockClient = null;
     private static boolean m_interrupt = false;
-    private  ThermoReadController rawController;
+    private MetaDataReadController rawController;
 
-    private MzdbServer(){
+    private MsDataConsumer(){
 
     }
 
-    public static MzdbServer getInstance(){
+    public static MsDataConsumer getInstance(){
         if(m_instance==null)
-            m_instance = new MzdbServer();
+            m_instance = new MsDataConsumer();
         return m_instance;
     }
 
@@ -50,16 +50,16 @@ public class MzdbServer implements IMzdbServer{
     public void initialize(int port){
         try {
             m_serverSocket = new ServerSocket(port);
-            rawController = new ThermoReadController();
+            rawController = new MetaDataReadController();
 
             try {
                 Properties properties = new Properties();
-                properties.load(MzdbController.class.getResourceAsStream("mzdbServerWriter.properties"));
-                String version = properties.getProperty("mzdbServer.version", "");
-                LOGGER.info("Mzdb Server Writer Version : "+version);
+                properties.load(MsDataConsumer.class.getResourceAsStream("msDataConsumer.properties"));
+                String version = properties.getProperty("msdataConsumer.version", "");
+                LOGGER.info("msData Consumer Version : "+version);
 
             } catch (Exception e) {
-                LOGGER.warn("error in addMzdbMetaData : can not get current version");
+                LOGGER.warn("error in initialize : can not get current version");
             }
 
         } catch (IOException e) {
@@ -71,7 +71,7 @@ public class MzdbServer implements IMzdbServer{
         try {
 
             if(m_serverSocket == null){
-                throw new RuntimeException("Mzdb Server has not been initialized. Call initialize first.");
+                throw new RuntimeException("msData Consumer has not been initialized. Call initialize first.");
             }
 
             while (true) { //Until server is interrupted
@@ -166,7 +166,7 @@ public class MzdbServer implements IMzdbServer{
 
 
     public void interrupt() {
-        LOGGER.debug(" --- Stop MzdbServer ");
+        LOGGER.debug(" --- Stop msData Consumer ");
         doInterrupt(); //notify process before exiting
         try {
             if (m_sockClient != null) {
@@ -176,7 +176,7 @@ public class MzdbServer implements IMzdbServer{
                 m_serverSocket.close();
             }
         } catch (Exception e) {
-            LOGGER.error(" Error stoping server "+e.getMessage());
+            LOGGER.error(" Error stoping msData Consumer "+e.getMessage());
         }
     }
 }
