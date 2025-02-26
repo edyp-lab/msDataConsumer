@@ -15,6 +15,8 @@ public class RunMetaData {
   String operator;
   long durationMin;
   Date acqTime;
+  long[] timeRange;
+  String methodName;
 
   public void read(SerializationReader reader) throws IOException {
     this.filePath = reader.readString();
@@ -23,7 +25,9 @@ public class RunMetaData {
     this.sampleName = reader.readString();
     this.operator = reader.readString();
     this.durationMin = reader.readInt64();
+    this.timeRange = reader.readArrayInt64();
     this.acqTime = new Date(reader.readInt64());
+    this.methodName=reader.readString();
   }
   public String getFilePath() {
     return filePath;
