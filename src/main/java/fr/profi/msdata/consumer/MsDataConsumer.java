@@ -56,7 +56,7 @@ public class MsDataConsumer implements IMsDataConsumer {
                 Properties properties = new Properties();
                 properties.load(MsDataConsumer.class.getResourceAsStream("msDataConsumer.properties"));
                 String version = properties.getProperty("msdataConsumer.version", "");
-                LOGGER.info("msData Consumer Version : "+version);
+                LOGGER.info("msData Consumer Version : {}", version);
 
             } catch (Exception e) {
                 LOGGER.warn("error in initialize : can not get current version");
@@ -145,7 +145,7 @@ public class MsDataConsumer implements IMsDataConsumer {
                             break;
                         }
                         default: {
-                            response = "KO:Unknow Request "+methodKey;
+                            response = "KO:Unknown Request "+methodKey;
                             LOGGER.error(response);
                         }
                     }
@@ -176,7 +176,7 @@ public class MsDataConsumer implements IMsDataConsumer {
                 m_serverSocket.close();
             }
         } catch (Exception e) {
-            LOGGER.error(" Error stoping msData Consumer "+e.getMessage());
+          LOGGER.error(" Error stopping msData Consumer {}", e.getMessage());
         }
     }
 }

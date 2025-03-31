@@ -2,6 +2,7 @@ package fr.profi.msdata.consumer;
 
 import fr.profi.msdata.serialization.SerializationCallback;
 import fr.profi.mzdb.serialization.SerializationReader;
+import fr.profi.thermoreader.model.AcquisitionErrorCode;
 import fr.profi.thermoreader.model.RunMetaData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,11 +29,14 @@ public class MetaDataReadController {
     try {
       RunMetaData md = new RunMetaData();
       md.read(reader);
-      logger.debug(" READ Run MetaData for file : "+md.getFilePath()+"    -> Acq "+md.getAcqName());
+      logger.debug(" READ Run MetaData for file : {}  ->  {}", md.getFilePath(), md);
       if(m_callback!=null) {
         List<RunMetaData> result = new ArrayList<>();
         result.add(md);
-        m_callback.run(md.getFilePath(), result, true);
+        if(md.getAcqErrorCode().equals(AcquisitionErrorCode.NO_ERROR))
+          m_callback.run(md.getFilePath(), result, true);
+        else
+          m_callback.run(md.getFilePath(), result, false);
       }
 
       return "OK";

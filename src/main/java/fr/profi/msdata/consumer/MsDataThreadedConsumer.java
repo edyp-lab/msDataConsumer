@@ -111,25 +111,25 @@ public class MsDataThreadedConsumer implements IMsDataConsumer {
         m_interrupt = true;
     }
 
-    protected synchronized void addRunnable(SocketClientRunnable runnable){
+    private synchronized void addRunnable(SocketClientRunnable runnable){
         if(m_interrupt && runningThread.isEmpty())
             interrupt();
         runningThread.add(runnable);
     }
 
-    protected synchronized void removeRunnable(SocketClientRunnable runnable){
+    private synchronized void removeRunnable(SocketClientRunnable runnable){
         runningThread.remove(runnable);
         if(m_interrupt && runningThread.isEmpty())
             interrupt();
     }
 
-    protected synchronized boolean isRunnableEmpty(){
+    private synchronized boolean isRunnableEmpty(){
         return runningThread.isEmpty();
     }
-    protected synchronized int getRunnableSize(){
+    private synchronized int getRunnableSize(){
         return runningThread.size();
     }
-    protected synchronized void addRunnableCallback(SerializationCallback c){
+    private synchronized void addRunnableCallback(SerializationCallback c){
          runningThread.forEach(r -> {
              r.m_rawController.setCallBack(c);
          });
@@ -140,6 +140,7 @@ public class MsDataThreadedConsumer implements IMsDataConsumer {
         doInterrupt();
         closeServer();
     }
+
     private void closeServer(){
         //Do not wait clients have finished... close all
         if (!isRunnableEmpty()) {
@@ -148,8 +149,8 @@ public class MsDataThreadedConsumer implements IMsDataConsumer {
         if(m_serverSocket != null) {
             try {
                 m_serverSocket.close();
-            } catch (IOException ignore) {
-               ignore.printStackTrace();
+            } catch (IOException e) {
+                LOGGER.error("Error closing Socket Server", e);
             }
         }
     }
