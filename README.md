@@ -6,7 +6,7 @@ call callBack with read data
 
 ## Release History
 
-### 1.2.3
+### 1.3.0
 Add a Read Acquisition MetaData method 
 Refactoring, Error code improvement, add information (time range...)
 
