@@ -6,7 +6,7 @@
   <artifactId>msdata-consumer</artifactId>
   <packaging>jar</packaging>
   <name>msDataConsumer</name>
-  <version>1.2.3-SNAPSHOT</version>
+  <version>1.4.0-SNAPSHOT</version>
 
   <properties>
     <timestamp>${maven.build.timestamp}</timestamp>
@@ -30,7 +30,7 @@
     <dependency>
       <groupId>fr.profi</groupId>
       <artifactId>mzdb-access_${scala.compat.version}</artifactId>
-      <version>1.4.0</version>
+      <version>1.4.1</version>
     </dependency>
 
     <dependency>
@@ -40,48 +40,16 @@
   </dependencies>
 
   <build>
-  <pluginManagement>
-    <plugins>
-
-      <plugin>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-maven-plugin</artifactId>
-
-      </plugin>
-
-
-      <plugin>
-        <groupId>org.eclipse.m2e</groupId>
-        <artifactId>lifecycle-mapping</artifactId>
-        <version>1.0.0</version>
-        <configuration>
-          <lifecycleMappingMetadata>
-            <pluginExecutions>
-              <pluginExecution>
-                <pluginExecutionFilter>
-                  <groupId>org.apache.maven.plugins</groupId>
-                  <artifactId>maven-dependency-plugin</artifactId>
-                  <versionRange>[2.0,)</versionRange>
-                  <goals>
-                    <goal>copy-dependencies</goal>
-                  </goals>
-                </pluginExecutionFilter>
-                <action>
-                  <execute />
-                </action>
-              </pluginExecution>
-            </pluginExecutions>
-          </lifecycleMappingMetadata>
-        </configuration>
-      </plugin>
-
-    </plugins>
-  </pluginManagement>
     <plugins>
 
       <plugin>
         <artifactId>maven-resources-plugin</artifactId>
         <executions>
+          <!-- Désactive l'exécution par défaut -->
+          <execution>
+            <id>default-resources</id>
+            <phase>none</phase>
+          </execution>
           <execution>
             <id>copy-config</id>
             <phase>validate</phase>
@@ -95,6 +63,27 @@
                 <resource>
                   <directory>src/main/resources/fr/profi/msdata/consumer</directory>
                   <filtering>true</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy-scripts</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <encoding>UTF-8</encoding>
+              <outputDirectory>${project.build.directory}</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>scripts</directory>
+                  <filtering>true</filtering>
+                  <includes>
+                    <include>**/*.bat</include>
+                    <include>**/*.sh</include>
+                  </includes>
                 </resource>
               </resources>
             </configuration>
