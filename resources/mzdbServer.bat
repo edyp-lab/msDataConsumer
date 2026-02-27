@@ -1,1 +1,0 @@
-java -Xms512m -Xmx768m -Djava.library.path="./lib" -jar MzdbServerWriter-@version@.jar

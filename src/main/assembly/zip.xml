@@ -22,26 +22,15 @@
             <outputDirectory>/lib</outputDirectory>
         </fileSet>
 
-        <!-- <fileSet>
-            <directory>${project.build.directory}/classes/fr/edyp/mzdb/server</directory>
-            <outputDirectory>/conf</outputDirectory>
-        </fileSet> -->
-
         <fileSet>
             <directory>${project.build.directory}</directory>
             <includes>
                 <include>*.jar</include>
+                <include>*.bat</include>
+                <include>*.sh</include>
             </includes>
             <outputDirectory>/</outputDirectory>
         </fileSet>
 
-        <fileSet>
-            <filtered>true</filtered>
-            <directory>resources</directory>
-            <includes>
-                <include>*.bat</include>
-            </includes>
-            <outputDirectory>/</outputDirectory>
-        </fileSet>
     </fileSets>
 </assembly>

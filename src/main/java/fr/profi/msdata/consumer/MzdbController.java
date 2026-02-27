@@ -1,6 +1,5 @@
-package fr.profi.mzdb.server;
+package fr.profi.msdata.consumer;
 
-import com.almworks.sqlite4java.SQLiteException;
 import fr.profi.mzdb.client.MzdbWriterApi;
 import fr.profi.mzdb.db.model.Software;
 import fr.profi.mzdb.db.model.params.ParamTree;
@@ -16,6 +15,10 @@ import fr.profi.mzdb.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This controller is used to create and fill mzdb file using specified SerializationReader
+ *
+ */
 public class MzdbController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MzdbController.class);
@@ -58,9 +61,9 @@ public class MzdbController {
 
             try {
                 Properties properties = new Properties();
-                properties.load(MzdbController.class.getResourceAsStream("mzdbServerWriter.properties"));
-                version = properties.getProperty("mzdbServer.version", "");
-                System.out.println("Mzdb Server Writer Version : "+version);
+                properties.load(MzdbController.class.getResourceAsStream("msDataConsumer.properties"));
+                version = properties.getProperty("msdataConsumer.version", "");
+                System.out.println("msData Consumer Version : "+version);
 
             } catch (Exception e) {
                 LOGGER.warn("error in addMzdbMetaData : can not get current version");
@@ -79,27 +82,30 @@ public class MzdbController {
         }
     }
 
-    public String addspectrum(SerializationReader reader)  throws IOException, SQLiteException {
+    /*Throw exception if an error occurs */
+    public String addspectrum(SerializationReader reader)   {
 
+        long id = -1;
+        String result;
         try {
             Spectrum spectrum = new Spectrum(reader);
             id = spectrum.getHeader().getSpectrumId();
             DataEncoding dataEncoding = new DataEncoding(reader);
 
-            m_mzdbWriterApi.addspectrum(spectrum, dataEncoding);
-
+            result = m_mzdbWriterApi.addspectrum(spectrum, dataEncoding);
             reader.resetStream(); // must be done at the end : avoid the stream to exceed max size when adding multiple spectrum
 
         } catch (Exception e) {
-            LOGGER.error("error in addspectrum "+id, e);
-            return "KO:"+e.getMessage();
+           LOGGER.error("error in add spectrum {} ",id, e);
+           throw new RuntimeException( /*return*/ "KO:"+e.getMessage());
         }
 
-
+        if(!result.equals("OK"))
+            throw new RuntimeException( /*return*/ "KO from m_mzdbWriterApi, spectrum (id) : " +result);
 
         return "OK";
     }
-    private static long id = -1;
+
 
 
     public String closedb() {
@@ -109,7 +115,7 @@ public class MzdbController {
 
 
 
-    public String test(SerializationReader reader)  throws IOException, SQLiteException {
+    public String test(SerializationReader reader) {
 
         try {
             String r = reader.readString();
