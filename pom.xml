@@ -9,6 +9,7 @@
   <version>1.4.0-SNAPSHOT</version>
 
   <properties>
+    <mzdb.version>1.5.0-SNAPSHOT</mzdb.version>
     <timestamp>${maven.build.timestamp}</timestamp>
     <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
   </properties>
@@ -29,8 +30,9 @@
 
     <dependency>
       <groupId>fr.profi</groupId>
-      <artifactId>mzdb-access_${scala.compat.version}</artifactId>
-      <version>1.4.1</version>
+      <artifactId>mzdb-access</artifactId>
+      <version>${mzdb.version}</version>
+      <classifier>${scala.compat.version}</classifier>
     </dependency>
 
     <dependency>
