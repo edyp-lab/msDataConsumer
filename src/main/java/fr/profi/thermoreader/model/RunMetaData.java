@@ -16,6 +16,8 @@ public class RunMetaData {
   Date acqTime;
   long[] timeRange;
   String methodName;
+  String vialInformation;
+  float injectionVolume;
   AcquisitionErrorCode acqError;
 
   public void read(SerializationReader reader) throws IOException {
@@ -30,6 +32,8 @@ public class RunMetaData {
       this.timeRange = reader.readArrayInt64();
       this.acqTime = new Date(reader.readInt64());
       this.methodName = reader.readString();
+      this.injectionVolume = reader.readFloat();
+      this.vialInformation = reader.readString();
     }
   }
   public String getFilePath() {
@@ -58,6 +62,18 @@ public class RunMetaData {
 
   public long getDurationMin() {
     return durationMin;
+  }
+
+  public String getMethodName(){
+    return methodName;
+  }
+
+  public Float getInjectionVolume(){
+    return 0.0f; //VDS To read !
+  }
+
+  public String getVialInformation(){
+    return vialInformation;
   }
 
   public AcquisitionErrorCode getAcqErrorCode() {

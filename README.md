@@ -6,6 +6,11 @@ call callBack with read data
 
 ## Release History
 
+### 1.4.0 (snapshot)
+
+* Add method name, injection volume and vial information in RunMetaData  
+* [Dev] Updated mzdb-access and mzdb-processing dependencies to use dynamic `classifier`
+
 ### 1.3.0
 Add a Read Acquisition MetaData method 
 Refactoring, Error code improvement, add information (time range...)
